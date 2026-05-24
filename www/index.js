@@ -42,7 +42,7 @@ document.getElementById("load").addEventListener("click", async () => {
         await chrome.alarms.clearAll();
 
         // 🧹 XOÁ storage cũ
-        await chrome.storage.local.set({ alarms: [] });
+        await localStorage.local.set({ alarms: [] });
 
         const now = Date.now();
 
@@ -62,7 +62,7 @@ document.getElementById("load").addEventListener("click", async () => {
         }
 
         // lưu storage
-        await chrome.storage.local.set({
+        await localStorage.local.set({
             alarms: newAlarms
         });
 
@@ -78,7 +78,7 @@ document.getElementById("load").addEventListener("click", async () => {
 // Reset token
 document.getElementById("resetTokenBtn")?.addEventListener("click", () => {
 
-    chrome.storage.local.remove("GITHUB_TOKEN", () => {
+    localStorage.local.remove("GITHUB_TOKEN", () => {
 
         alert("🔄 Đã xoá token GitHub");
     });
@@ -89,7 +89,7 @@ async function getOrAskToken() {
 
     return new Promise(resolve => {
 
-        chrome.storage.local.get(["GITHUB_TOKEN"], (data) => {
+        localStorage.local.get(["GITHUB_TOKEN"], (data) => {
 
             if (data.GITHUB_TOKEN) {
                 resolve(data.GITHUB_TOKEN);
@@ -100,7 +100,7 @@ async function getOrAskToken() {
 
             if (token) {
 
-                chrome.storage.local.set({
+                localStorage.local.set({
                     GITHUB_TOKEN: token
                 });
 
@@ -119,7 +119,7 @@ function addAlarm(id, when, hall = "Không rõ") {
 
     chrome.alarms.create(id, { when });
 
-    chrome.storage.local.get({ alarms: [] }, (data) => {
+    localStorage.local.get({ alarms: [] }, (data) => {
 
         data.alarms.push({
             id,
@@ -127,7 +127,7 @@ function addAlarm(id, when, hall = "Không rõ") {
             hall
         });
 
-        chrome.storage.local.set({
+        localStorage.local.set({
             alarms: data.alarms
         });
 
@@ -138,7 +138,7 @@ function addAlarm(id, when, hall = "Không rõ") {
 // Render list
 function render() {
 
-    chrome.storage.local.get({ alarms: [] }, (data) => {
+    localStorage.local.get({ alarms: [] }, (data) => {
 
         const div = document.getElementById("list");
 
