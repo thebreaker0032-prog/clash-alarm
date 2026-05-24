@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo thức</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 10px;
+            width: 250px;
+            background: #111;
+            color: #fff;
+        }
+
+        input,
+        button {
+            padding: 6px;
+            margin: 5px 0;
+            width: 100%;
+            border-radius: 6px;
+            border: none;
+        }
+
+        button {
+            background: #2d89ef;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1b5fbf;
+        }
+    </style>
+</head>
+
+<body>
+    <h3>⏰ Đặt Báo Thức</h3>
+    <input type="number" id="minutes" placeholder="Số phút từ bây giờ">
+    <button id="set">Thêm Báo Thức</button>
+    <button id="load">📥 Load từ GitHub</button>
+    <div id="list"></div>
+
+    <script src="popup.js"></script>
+</body>
+
+</html>
