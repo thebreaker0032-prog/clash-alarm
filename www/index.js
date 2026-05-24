@@ -64,6 +64,7 @@ function triggerAlarm(hall) {
 }
 
 // ===== TIMER =====
+<<<<<<< HEAD
 async function scheduleAlarm(alarm) {
 
     await LocalNotifications.schedule({
@@ -93,6 +94,29 @@ async function scheduleAlarm(alarm) {
             }
         ]
     });
+=======
+function scheduleAlarm(alarm) {
+
+    const delay =
+        alarm.time - Date.now();
+
+    if (delay <= 0) return;
+
+    setTimeout(() => {
+
+        triggerAlarm(alarm.hall);
+
+        alarms =
+            alarms.filter(
+                a => a.id !== alarm.id
+            );
+
+        saveAlarms();
+
+        render();
+
+    }, delay);
+>>>>>>> 85016d7 (fix android webview)
 }
 
 // ===== ADD =====
@@ -220,4 +244,8 @@ document.getElementById("load")
 // ===== RESTORE =====
 alarms.forEach(scheduleAlarm);
 
+<<<<<<< HEAD
 render();
+=======
+render();
+>>>>>>> 85016d7 (fix android webview)
