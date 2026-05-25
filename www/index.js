@@ -48,7 +48,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
         });
     }
-
+    await LocalNotifications.createChannel({
+        id: "alarm-channel",
+        name: "Alarm Channel",
+        importance: 5,
+        sound: "alarm",
+        vibration: true
+    });
     // ===== TIMER =====
     async function scheduleAlarm(alarm) {
 
@@ -70,7 +76,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                         allowWhileIdle: true
                     },
                     sound: "alarm",
-                    
+
                     ongoing: true,
 
                     autoCancel: false
