@@ -48,15 +48,17 @@ document.addEventListener("DOMContentLoaded", async () => {
             `;
         });
     }
-    await LocalNotifications.createChannel({
-        id: "alarm-channel",
-        name: "Alarm Channel",
-        importance: 5,
-        sound: "alarm",
-        vibration: true
-    });
+
     // ===== TIMER =====
     async function scheduleAlarm(alarm) {
+
+        await LocalNotifications.createChannel({
+            id: "alarm-channel",
+            name: "Alarm Channel",
+            importance: 5,
+            sound: "alarm",
+            vibration: true
+        });
 
         await LocalNotifications.schedule({
             notifications: [
@@ -71,10 +73,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                     body:
                         "Đến giờ rồi!",
 
+                    channelId: "alarm-channel",
+
                     schedule: {
                         at: new Date(alarm.time),
                         allowWhileIdle: true
                     },
+
                     sound: "alarm",
 
                     ongoing: true,
