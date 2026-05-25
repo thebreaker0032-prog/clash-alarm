@@ -56,7 +56,7 @@ function render() {
 function triggerAlarm(hall) {
 
     const audio =
-        new Audio("alarm.mp3");
+        new Audio("alarm.wav");
 
     audio.play();
 
@@ -82,7 +82,7 @@ async function scheduleAlarm(alarm) {
                     allowWhileIdle: true
                 },
 
-                sound: "alarm.mp3",
+                sound: "alarm.wav",
 
                 ongoing: true,
 
