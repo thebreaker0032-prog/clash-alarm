@@ -1,3 +1,9 @@
+import { LocalNotifications } from '@capacitor/local-notifications';
+document.addEventListener("DOMContentLoaded", async () => {
+
+    await LocalNotifications.requestPermissions();
+
+});
 const GITHUB_USER = "thebreaker0032-prog";
 const REPO_NAME = "thebreaker";
 const FILE_PATH = "time-tracker-data.json";
@@ -58,27 +64,35 @@ function triggerAlarm(hall) {
 }
 
 // ===== TIMER =====
-function scheduleAlarm(alarm) {
+async function scheduleAlarm(alarm) {
 
-    const delay =
-        alarm.time - Date.now();
+    await LocalNotifications.schedule({
+        notifications: [
+            {
+                id: Number(
+                    alarm.time.toString().slice(-8)
+                ),
 
-    if (delay <= 0) return;
+                title: `🔔 Hall ${alarm.hall}`,
 
-    setTimeout(() => {
+                body: "Đến giờ rồi!",
 
-        triggerAlarm(alarm.hall);
+                schedule: {
+                    at: new Date(alarm.time),
+                    allowWhileIdle: true
+                },
 
-        alarms =
-            alarms.filter(
-                a => a.id !== alarm.id
-            );
+                sound: "alarm.mp3",
 
-        saveAlarms();
+                ongoing: true,
 
-        render();
+                autoCancel: false,
 
-    }, delay);
+                largeBody:
+                    `Hall ${alarm.hall} đang tới giờ!`
+            }
+        ]
+    });
 }
 
 // ===== ADD =====
