@@ -50,42 +50,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // ===== TIMER =====
-    await LocalNotifications.createChannel({
-        id: "alarm-channel",
-        name: "Alarm Channel",
-        importance: 5,
-        sound: "alarm",
-        vibration: true
-    });
+    async function scheduleAlarm(alarm) {
 
-    await LocalNotifications.schedule({
-        notifications: [
-            {
-                id: Number(
-                    alarm.time.toString().slice(-8)
-                ),
+        await LocalNotifications.schedule({
+            notifications: [
+                {
+                    id: Number(
+                        alarm.time.toString().slice(-8)
+                    ),
 
-                title:
-                    `🔔 Hall ${alarm.hall}`,
+                    title:
+                        `🔔 Hall ${alarm.hall}`,
 
-                body:
-                    "Đến giờ rồi!",
+                    body:
+                        "Đến giờ rồi!",
 
-                channelId: "alarm-channel",
+                    schedule: {
+                        at: new Date(alarm.time),
+                        allowWhileIdle: true
+                    },
+                    sound: "alarm",
+                    
+                    ongoing: true,
 
-                schedule: {
-                    at: new Date(alarm.time),
-                    allowWhileIdle: true
-                },
-
-                sound: "alarm",
-
-                ongoing: true,
-
-                autoCancel: false
-            }
-        ]
-    });
+                    autoCancel: false
+                }
+            ]
+        });
+    }
 
     // ===== ADD =====
     function addAlarm(id, when, hall) {
