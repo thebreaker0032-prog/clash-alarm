@@ -4,247 +4,222 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     await LocalNotifications.requestPermissions();
 
-});
+    const GITHUB_USER = "thebreaker0032-prog";
+    const REPO_NAME = "thebreaker";
+    const FILE_PATH = "time-tracker-data.json";
 
-const GITHUB_USER = "thebreaker0032-prog";
-const REPO_NAME = "thebreaker";
-const FILE_PATH = "time-tracker-data.json";
+    let alarms =
+        JSON.parse(localStorage.getItem("alarms") || "[]");
 
-let alarms =
-    JSON.parse(localStorage.getItem("alarms") || "[]");
+    // ===== SAVE =====
+    function saveAlarms() {
 
-// ===== SAVE =====
-function saveAlarms() {
+        localStorage.setItem(
+            "alarms",
+            JSON.stringify(alarms)
+        );
+    }
 
-    localStorage.setItem(
-        "alarms",
-        JSON.stringify(alarms)
-    );
-}
+    // ===== RENDER =====
+    function render() {
 
-// ===== RENDER =====
-function render() {
+        const div =
+            document.getElementById("list");
 
-    const div =
-        document.getElementById("list");
+        div.innerHTML = "";
 
-    div.innerHTML = "";
+        alarms.forEach(a => {
 
-    alarms.forEach(a => {
+            const t =
+                new Date(a.time)
+                    .toLocaleTimeString();
 
-        const t =
-            new Date(a.time)
-                .toLocaleTimeString();
+            div.innerHTML += `
+                <div style="
+                    background:#222;
+                    padding:10px;
+                    margin:5px 0;
+                    border-radius:8px;
+                    font-size:18px;
+                ">
+                    🔔 Hall ${a.hall}
+                    <br>
+                    ⏰ ${t}
+                </div>
+            `;
+        });
+    }
 
-        div.innerHTML += `
-            <div style="
-                background:#222;
-                padding:10px;
-                margin:5px 0;
-                border-radius:8px;
-                font-size:18px;
-            ">
-                🔔 Hall ${a.hall}
-                <br>
-                ⏰ ${t}
-            </div>
-        `;
-    });
-}
+    // ===== TIMER =====
+    async function scheduleAlarm(alarm) {
 
-// ===== PLAY ALARM =====
-function triggerAlarm(hall) {
+        await LocalNotifications.schedule({
+            notifications: [
+                {
+                    id: Number(
+                        alarm.time.toString().slice(-8)
+                    ),
 
-    const audio =
-        new Audio("alarm.wav");
+                    title:
+                        `🔔 Hall ${alarm.hall}`,
 
-    audio.play();
+                    body:
+                        "Đến giờ rồi!",
 
-    alert(`🔔 Hall ${hall} tới giờ!`);
-}
+                    schedule: {
+                        at: new Date(alarm.time),
+                        allowWhileIdle: true
+                    },
 
-// ===== TIMER =====
-async function scheduleAlarm(alarm) {
+                    ongoing: true,
 
-    await LocalNotifications.schedule({
-        notifications: [
-            {
-                id: Number(
-                    alarm.time.toString().slice(-8)
-                ),
+                    autoCancel: false
+                }
+            ]
+        });
+    }
 
-                title: `🔔 Hall ${alarm.hall}`,
+    // ===== ADD =====
+    function addAlarm(id, when, hall) {
 
-                body: "Đến giờ rồi!",
+        const alarm = {
+            id,
+            time: when,
+            hall
+        };
 
-                schedule: {
-                    at: new Date(alarm.time),
-                    allowWhileIdle: true
-                },
+        alarms.push(alarm);
 
-                sound: "alarm.wav",
+        saveAlarms();
 
-                ongoing: true,
+        scheduleAlarm(alarm);
 
-                autoCancel: false,
+        render();
+    }
 
-                largeBody:
-                    `Hall ${alarm.hall} đang tới giờ!`
+    // ===== MANUAL =====
+    document.getElementById("set")
+        .addEventListener("click", () => {
+
+            const mins =
+                parseInt(
+                    document.getElementById("minutes").value
+                );
+
+            if (isNaN(mins) || mins <= 0) {
+
+                alert("Nhập phút hợp lệ");
+
+                return;
             }
-        ]
-    });
-}
 
-// ===== ADD =====
-function addAlarm(id, when, hall) {
+            const hall = "Manual";
 
-    const alarm = {
-        id,
-        time: when,
-        hall
-    };
+            const when =
+                Date.now() + mins * 60000;
 
-    alarms.push(alarm);
+            const id =
+                `${hall}_${when}`;
 
-    saveAlarms();
+            addAlarm(id, when, hall);
+        });
 
-    scheduleAlarm(alarm);
+    // ===== LOAD GITHUB =====
+    document.getElementById("load")
+        .addEventListener("click", async () => {
 
-    render();
-}
+            let token =
+                localStorage.getItem("github_token");
 
-// ===== MANUAL =====
-document.getElementById("set")
-    .addEventListener("click", () => {
+            if (!token) {
 
-        const mins =
-            parseInt(
-                document.getElementById("minutes").value
-            );
+                token =
+                    prompt("🔑 GitHub Token:");
 
-        if (isNaN(mins) || mins <= 0) {
+                if (!token) return;
 
-            alert("Nhập phút hợp lệ");
-
-            return;
-        }
-
-        const hall = "Manual";
-
-        const when =
-            Date.now() + mins * 60000;
-
-        const id =
-            `${hall}_${when}`;
-
-        addAlarm(id, when, hall);
-    });
-
-// ===== LOAD GITHUB =====
-document.getElementById("load")
-    .addEventListener("click", async () => {
-
-        let token =
-            localStorage.getItem("github_token");
-
-        if (!token) {
-
-            token =
-                prompt("🔑 GitHub Token:");
-
-            if (!token) return;
-
-            localStorage.setItem(
-                "github_token",
-                token
-            );
-        }
-
-        try {
-
-            const url =
-                `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
-
-            console.log("Loading:", url);
-
-            const res =
-                await fetch(url, {
-                    headers: {
-                        Authorization:
-                            `Bearer ${token}`,
-                        Accept:
-                            "application/vnd.github+json"
-                    }
-                });
-
-            console.log("Status:", res.status);
-
-            if (!res.ok) {
-
-                const txt =
-                    await res.text();
-
-                console.error(txt);
-
-                throw new Error(
-                    `GitHub lỗi ${res.status}`
+                localStorage.setItem(
+                    "github_token",
+                    token
                 );
             }
 
-            const data =
-                await res.json();
+            try {
 
-            console.log(data);
+                const url =
+                    `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
 
-            const jsonText =
-                atob(
-                    data.content.replace(/\n/g, "")
-                );
+                const res =
+                    await fetch(url, {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`,
+                            Accept:
+                                "application/vnd.github+json"
+                        }
+                    });
 
-            const list =
-                JSON.parse(jsonText);
+                if (!res.ok) {
 
-            alarms = [];
+                    throw new Error(
+                        `GitHub lỗi ${res.status}`
+                    );
+                }
 
-            saveAlarms();
+                const data =
+                    await res.json();
 
-            const now =
-                Date.now();
-
-            let count = 0;
-
-            for (const entry of list) {
-
-                if (entry.timestamp > now) {
-
-                    const id =
-                        `${entry.hall}_${entry.timestamp}`;
-
-                    addAlarm(
-                        id,
-                        entry.timestamp,
-                        entry.hall
+                const jsonText =
+                    atob(
+                        data.content.replace(/\n/g, "")
                     );
 
-                    count++;
+                const list =
+                    JSON.parse(jsonText);
+
+                alarms = [];
+
+                saveAlarms();
+
+                const now =
+                    Date.now();
+
+                let count = 0;
+
+                for (const entry of list) {
+
+                    if (entry.timestamp > now) {
+
+                        const id =
+                            `${entry.hall}_${entry.timestamp}`;
+
+                        addAlarm(
+                            id,
+                            entry.timestamp,
+                            entry.hall
+                        );
+
+                        count++;
+                    }
                 }
+
+                alert(
+                    `✅ Loaded ${count} alarms`
+                );
+
+            } catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "❌ " +
+                    err.message
+                );
             }
+        });
 
-            alert(
-                `✅ Loaded ${count} alarms`
-            );
+    alarms.forEach(scheduleAlarm);
 
-        } catch (err) {
+    render();
 
-            console.error(err);
-
-            alert(
-                "❌ " +
-                err.message
-            );
-        }
-    });
-// ===== RESTORE =====
-alarms.forEach(scheduleAlarm);
-
-render();
+});
