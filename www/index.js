@@ -1,9 +1,11 @@
 import { LocalNotifications } from '@capacitor/local-notifications';
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     await LocalNotifications.requestPermissions();
 
 });
+
 const GITHUB_USER = "thebreaker0032-prog";
 const REPO_NAME = "thebreaker";
 const FILE_PATH = "time-tracker-data.json";
@@ -53,13 +55,11 @@ function render() {
 // ===== PLAY ALARM =====
 function triggerAlarm(hall) {
 
-    // play sound
     const audio =
         new Audio("alarm.mp3");
 
     audio.play();
 
-    // popup
     alert(`🔔 Hall ${hall} tới giờ!`);
 }
 
