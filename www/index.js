@@ -1,4 +1,4 @@
-import { LocalNotifications } from '@capacitor/local-notifications';
+const { LocalNotifications } = Capacitor.Plugins;
 
 document.addEventListener("DOMContentLoaded", async () => {
 
