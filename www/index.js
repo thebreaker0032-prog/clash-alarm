@@ -144,36 +144,61 @@ document.getElementById("set")
 document.getElementById("load")
     .addEventListener("click", async () => {
 
-        const token =
-            prompt("🔑 GitHub Token:");
+        let token =
+            localStorage.getItem("github_token");
 
-        if (!token) return;
+        if (!token) {
+
+            token =
+                prompt("🔑 GitHub Token:");
+
+            if (!token) return;
+
+            localStorage.setItem(
+                "github_token",
+                token
+            );
+        }
 
         try {
 
             const url =
                 `https://api.github.com/repos/${GITHUB_USER}/${REPO_NAME}/contents/${FILE_PATH}`;
 
+            console.log("Loading:", url);
+
             const res =
                 await fetch(url, {
                     headers: {
                         Authorization:
-                            `token ${token}`
+                            `Bearer ${token}`,
+                        Accept:
+                            "application/vnd.github+json"
                     }
                 });
 
-            if (!res.ok)
+            console.log("Status:", res.status);
+
+            if (!res.ok) {
+
+                const txt =
+                    await res.text();
+
+                console.error(txt);
+
                 throw new Error(
                     `GitHub lỗi ${res.status}`
                 );
+            }
 
             const data =
                 await res.json();
 
+            console.log(data);
+
             const jsonText =
                 atob(
-                    data.content
-                        .replace(/\n/g, "")
+                    data.content.replace(/\n/g, "")
                 );
 
             const list =
@@ -188,7 +213,7 @@ document.getElementById("load")
 
             let count = 0;
 
-            list.forEach(entry => {
+            for (const entry of list) {
 
                 if (entry.timestamp > now) {
 
@@ -203,7 +228,7 @@ document.getElementById("load")
 
                     count++;
                 }
-            });
+            }
 
             alert(
                 `✅ Loaded ${count} alarms`
@@ -213,10 +238,12 @@ document.getElementById("load")
 
             console.error(err);
 
-            alert("❌ " + err.message);
+            alert(
+                "❌ " +
+                err.message
+            );
         }
     });
-
 // ===== RESTORE =====
 alarms.forEach(scheduleAlarm);
 
